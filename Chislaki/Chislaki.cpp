@@ -1,93 +1,56 @@
-﻿
-#include "conio.h"
-#include "math.h"
-#include "iostream"
-using namespace std;
+﻿#include <iostream>
+#include <math.h>
 
-int n, matrix_size;
-double znamenatel;
-double A[100][100]; //matrica koefficientov
-double B[100]; //matrica svobodnih chlenov
-double U[100];
-double X[100]; //na vivod
-double V[100];
+long double fun(long double x)
+{
+    return log(x * x + 2);
+}
+
+void rectangular_method(long double a, long double b, long double steps)
+{
+    long double h = (b - a) / steps;
+    long double f = 0;
+    for (int i = 1; i <= steps; i++)
+    {
+        long double argument = a + h * (i - 0.5);
+        f += h * fun(argument); //берём по серединке прямоугольника
+    }
+    std::cout << "By the rectangular method: " << f << "\n";
+}
+
+void trapezoid_method(long double a, long double b, long double steps)
+{
+    long double h = (b - a) / steps;
+    long double f = fun(a) + fun(b);
+    for (int i = 1; i <= steps - 1; i++)
+    {
+        f += 2.00 * fun(a + h * i);
+    }
+    f = f * (h / 2.00);
+    std::cout << "By the trapezoid method:   " << f << "\n";
+}
+
+void simpson_method(long double a, long double b, long double steps)
+{
+    long double h = (b - a) / steps;
+    long double f = fun(a) + fun(b);
+    int k;
+    for (int i = 1; i <= steps - 1; i++)
+    {
+        if (i % 2 == 0) k = 2;
+        else k = 4;
+        f += k * fun(a + h * i);
+    }
+    f = f * (h / 3.00);
+    std::cout << "By the simpson method:     " << f << "\n";
+}
 
 int main()
 {
-    matrix_size = 100; //razmernost matrici
-
-    //vvod znacheniy...
-    //zapolnim nolikami
-    for (int i = 0; i < matrix_size; i++)
-        for (int j = 0; j < matrix_size; j++)
-            A[i][j] = 0;
-
-    //rasstavim b
-    int k = 0;
-    for (int i = 0; i < matrix_size; i++)
-    {
-        A[i][k] = 2;
-        k++;
-    }
-
-    //rasstavim c
-    k = 1;
-    for (int i = 0; i < matrix_size - 1; i++)
-    {
-        A[i][k] = 1;
-        k++;
-    }
-
-    //rasstavim a
-    k = 0;
-    for (int i = 1; i < matrix_size; i++)
-    {
-        A[i][k] = 1;
-        k++;
-    }
-
-    //rasstavim d
-    for (int i = 0; i < matrix_size; i++)
-        B[i] = 90;  //variant 9
-
-
-
-    cout << "Matrix A:" << endl;
-    for (int i = 0; i < 16; i++)
-    {
-        for (int j = 0; j < 16; j++)
-            cout << A[i][j] << "\t ";
-        cout << endl;
-    }
-
-
-
-    cout << "Matrix B:" << endl;
-    for (int i = 0; i < matrix_size; i++)
-        cout << B[i] << endl;
-
-
-
-
-    n = matrix_size - 1;  //eto ne ta "n" iz formuli
-    U[0] = -A[0][1] / A[0][0];
-    V[0] = B[0] / A[0][0];
-
-    for (int i = 1; i < n; i++)
-    {
-        znamenatel = A[i][i] + A[i][i - 1] * U[i - 1];
-        U[i] = -A[i][i + 1] / znamenatel;
-        V[i] = (B[i] - A[i][i - 1] * V[i - 1]) / znamenatel;
-    }
-
-    X[n] = (B[n] - A[n][n - 1] * V[n - 1]) / (A[n][n] + A[n][n - 1] * U[n - 1]);
-
-    for (int i = n - 1; i >= 0; i--)
-        X[i] = U[i] * X[i + 1] + V[i];
-
-    cout << "Matrix X:" << endl;
-    for (int i = 0; i < matrix_size; i++)
-        cout << X[i] << endl;
-
-    return 0;
+    long double b = 100; //верхний предел
+    long double a = 0; //нижний предел
+    long double steps = 1000; //шаг
+    rectangular_method(a, b, steps);
+    trapezoid_method(a, b, steps);
+    simpson_method(a, b, steps);
 }
